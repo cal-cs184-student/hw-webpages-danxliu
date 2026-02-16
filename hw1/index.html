@@ -31,35 +31,35 @@
   <body>
     <div class="container">
       <h1>CS184/284A Spring 2025 Homework 1 Write-Up</h1>
-      <div style="text-align: center">Names:</div>
+      <div style="text-align: center">Names: Daniel Liu</div>
 
       <br />
 
-      Link to webpage: (TODO)
-      <a href="https://cs184.eecs.berkeley.edu/sp25"
-        >cs184.eecs.berkeley.edu/sp25</a
+      Link to webpage:
+      <a href="https://cal-cs184-student.github.io/hw-webpages-danxliu"
+        >Daniel Liu 184 Homeworks</a
       >
 
       <br />
 
-      Link to GitHub repository: (TODO)
-      <a href="https://cs184.eecs.berkeley.edu/sp25"
-        >cs184.eecs.berkeley.edu/sp25</a
+      Link to GitHub repository:
+      <a href="https://github.com/cal-cs184-student/hw0-intro-danxliu"
+        >Daniel Liu 184 GitHub</a
       >
-
-      <figure>
-        <img src="lion.jpg" alt="Lion" style="width: 50%" />
-        <figcaption>You can add images with captions!</figcaption>
-      </figure>
 
       <!--
 		We've already added one heading per task, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
       <h2>Overview</h2>
-      Give a high-level overview of what you implemented in this homework. Think
-      about what you've built as a whole. Share your thoughts on what
-      interesting things you've learned from completing the homework.
+      In this homework, I get to implement part of the rasterization pipeline
+      for a graphics program. This includes rasterization and supersampling,
+      mipmap level sampling, and texture pixel sampling. This homework was
+      really interesting, since I play games and frequently mess with settings
+      such as bilinear filtering, mipmap levels, supersampling level, etc... but
+      I've never really known exactly what they do and how they are implemented.
+      Learning and implementing the various techniques helped me understand the
+      fundamentals of what the techniques do and their tradeoffs.
 
       <h2>Task 1: Drawing Single-Color Triangles</h2>
       To raterize triangles, we can sample pixels in the bounding box of each
@@ -419,7 +419,9 @@
             <td style="text-align: center">
               <img src="task6/lzero_plinear.png" width="400px" />
               <figcaption>Level: Zero, Pixel: Linear</figcaption>
-              <div>Texture blurring with lowest mipmap level (highest quality).</div>
+              <div>
+                Texture blurring with lowest mipmap level (highest quality).
+              </div>
             </td>
           </tr>
           <tr>
