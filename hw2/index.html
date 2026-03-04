@@ -146,9 +146,15 @@
     <h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
     <h3>Part 3: Area-weighted vertex normals</h3>
-    To implement the area-weighted vertex normals, I looped through each of the neighboring faces to the vertex and
-    summed up the normals for each. To loop through the faces, I use a <code>do-while</code> that loops through the half edges using the <code>half_edge->twin()->next()</code> style in the examples.
-    Given a half-edge, I can also get the normal associated with the face using <code>h->face()->normal()</code>.
+    To implement the area-weighted vertex normals, I looped through each of the neighboring faces of the vertex using a
+    <code>do-while</code> loop.
+    For each face, I got the vertices and computed the area of the triangle using the cross product between the adjacent
+    vertices.
+    If the vertices of the triangle were <code>v1, v2, v3</code> in counterclockwise order, the triangle area is
+    <code>cross(v1 - v0, v2 - v1) / 2</code>.
+    Since we are normalizing at the end, we can just ignore the division part.
+    Finally, I return the normalized result.
+    Note that we don't need to divide by the number of faces, since the normalization will make it unnecessary.
     <br />
     <br />
     <div style="display: flex; flex-direction: column; align-items: center">
@@ -163,43 +169,125 @@
     </div>
 
     <h3>Part 4: Edge flip</h3>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-    est laborum.
+    To perform edge flip, I first drew a diagram of the starting and ending state.
+    To flip the edge, I update the two center half-edges using <code>setNeighbors</code> to assign new vertex and next
+    pointers.
+    I also need to reassign the next pointers of all the previous outer half-edges to account for the new shift.
+    Finally, to be safe, I reassign all the vertex and face half-edges based on the new half-edges.
+    <br />
+    <br />
+    I encountered a few errors with the edge flip operation, since I started it before drawing out the diagram and
+    trying to do it mentally.
+    I first tried to debug it for a while using the tools on the renderer, which gives the half-edges corresponding to
+    the edge, face, or vertex.
+    However, I ended up deciding to redo my code and draw out a full diagram of new and old states.
+    I labeled the new and old states, then reassigned half-edges and other necessary components based on this.
+    <br />
+    <br />
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <table style="width: 100%; text-align: center; border-collapse: collapse">
+        <tr>
+          <td style="text-align: center">
+            <img src="4/original.png" width="400px" />
+            <figcaption>Original teapot.</figcaption>
+          </td>
+          <td style="text-align: center">
+            <img src="4/edge_flip.png" width="400px" />
+            <figcaption>Teapot after edge flips.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <h3>Part 5: Edge split</h3>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-    est laborum.
+    To perform edge split, I first drew a diagram of the starting and ending state.
+    I decided to keep the initial half-edges as the border around the "diamond" shape, and add new 3 new edges, 6 new
+    half-edges, 2 new faces, and one new vertex to the shape.
+    <br />
+    <br />
+    For each of the new and old half-edges, I used <code>setNeighbors</code> to set the neighbors appropriately.
+    For each of the new edges, I used <code>halfedge()</code> to set the according half-edge.
+    For each of the new faces, I used <code>halfedge()</code> to set the according half-edge.
+    I also set the <code>isNew</code> flag to <code>true</code> for new edges and faces.
+    <br />
+    <br />
+    I didn't really have too many issues debugging. By fully drawing out the new and old features, I was able to code it
+    up pretty easily.
+    <br />
+    <br />
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <table style="width: 100%; text-align: center; border-collapse: collapse">
+        <tr>
+          <td style="text-align: center">
+            <img src="5/original.png" width="400px" />
+            <figcaption>Original teapot.</figcaption>
+          </td>
+          <td style="text-align: center">
+            <img src="5/edge_split.png" width="400px" />
+            <figcaption>Teapot after edge splits.</figcaption>
+          </td>
+          <td style="text-align: center">
+            <img src="5/edge_flip.png" width="400px" />
+            <figcaption>Teapot after edge flips and splits</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <h3>Part 6: Loop subdivision for mesh upsampling</h3>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-    est laborum.
-
-    <h2>
-      (Optional) Section III: Potential Extra Credit - Art Competition: Model
-      something Creative
-    </h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-    est laborum.
+    To implement loop subdivision, I followed the recommended steps on implementation.
+    First, I decided to compute new vertex positions in the input mesh, for each of the old vertices and each of the old edges.
+    For each old vertex, I looped through its neighboring vertices and applied the following formula to compute the new vertex position:
+    \[\text{new_pos} = (1 - n \times u) \cdot \text{old_pos} + u \cdot \sum_{i=1}^n \text{neighbor_pos}_i\]
+    where \(n\) is the number of neighboring vertices and \(u\) is defined as
+    \[u = \begin{cases}
+    \frac{3}{16} & \text{if } n = 3 \\
+    \frac{3}{8n} & \text{if } n > 3
+    \end{cases}\]
+    I stored this value into <code>v->newPosition</code>.
+    <br />
+    <br />
+    For each old edge, I computed the new vertex position using the following formula, where A and B are the endpoints of the edge, and C and D are the other two vertices of the faces that share the edge:
+    \[
+    \text{new_pos} = \frac{3}{8} \cdot (\text{A} + \text{B}) + \frac{1}{8} \cdot (\text{C} + \text{D})
+    \]
+    I stored this value into <code>e->newPosition</code>.
+    <br />
+    <br />
+    After computing the new vertex positions, I stored all of the old edges into a new <code>vector</code>.
+    Then, I looped through each of the old edges and performed an edge split on it, using the new vertex position I computed for the edge, <code>e->newPosition</code>.
+    Next, I looped through all edges, and for each new edge that connected an old and new vertex, I flipped the edge.
+    I used the <code>isNew</code> flag to determine whether a vertex or edge is new or old.
+    <br />
+    <br />
+    Finally, I looped through all the vertices and updated their positions to the new vertex positions I computed at the beginning.
+    <br />
+    <br />
+    We can see that the the cube edges have been smoothed out and the shape looks like an uneven sphere.
+    I can pre-split some of the edges on the center of the cube faces to make it more symmetrical and more like a sphere, but it still gets smoothed out after subdividing.
+    <br />
+    Without doing any preprocessing, the cube appears asymmetric.
+    Some of the vertices on the corners of the cube have an extra edge on the center of the face.
+    As a result, these vertices have more neighboring vertices than the other corner vertices, giving them less weight on their original position and causing them to be pulled in more towards the center of the cube.
+    Thus, the cube would appear to be asymmetrical.
+    <br />
+    To fix this, I can pre-process the edges on the faces of the cube by splitting them, giving each corner vertex the same number of neighboring vertices and making the cube symmetrical after subdivision.
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <table style="width: 100%; text-align: center; border-collapse: collapse">
+        <tr>
+          <td style="text-align: center">
+            <img src="6/subdivided_cube.png" width="400px" />
+            <figcaption>Subdivided cube.</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">
+            <img src="6/symmetric_subdivision.png" width="400px" />
+            <figcaption>Symmetric subdivided cube by edge splitting the face edge.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 </body>
 
 </html>
