@@ -62,7 +62,7 @@
       interesting things you've learned from completing the homework.
 
       <h2>Part 1: Ray Generation and Scene Intersection</h2>
-      <h3>Ray Generation and Primitive Intersection Overview</h3>
+      <h3>Ray Generation and Primitive Intersections</h3>
       To draw images using ray tracing, a few steps need to be implemented. We
       need to be able to shoot multiple rays from a camera and through a pixel
       on the image plane and determine its intersection point on an object in
@@ -144,31 +144,114 @@
               <figcaption>Banana.</figcaption>
             </td>
             <td style="text-align: center">
-              <img src="1/building.png" width="400px" />
-              <figcaption>Building.</figcaption>
+              <img src="1/CBspheres.png" width="400px" />
+              <figcaption>CBSpheres.</figcaption>
             </td>
           </tr>
           <tr>
             <td style="text-align: center">
-              <img src="1/CBspheres.png" width="400px" />
-              <figcaption>Spheres.</figcaption>
+              <img src="1/CBgems.png" width="400px" />
+              <figcaption>CBGems.</figcaption>
             </td>
             <td style="text-align: center">
               <img src="1/CBcoil.png" width="400px" />
-              <figcaption>Coil.</figcaption>
+              <figcaption>CBCoil.</figcaption>
             </td>
           </tr>
         </table>
       </div>
 
       <h2>Part 2: Bounding Volume Hierarchy</h2>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-      est laborum.
+      <h3>BVH Construction Algorithm</h3>
+      To construct the BVH, I chose to use the median shape's centroid for the
+      split point. To determine the best axis to split on, I tried all three
+      axises and calculated the following cost heuristic: \[ \text{Left Surface
+      Area} \times \text{Number of Left Triangles} + \text{Right Surface Area}
+      \times \text{Number of Right Triangles} \] For each axis, I first sorted
+      the items based on their centroids along the given axis using the
+      <code>std::sort</code> function. Afterwards, I chose to split along the
+      axis with the smallest heuristic. Finally, I can recursively call
+      <code>construct_bvh</code> on the two halves that were created during the
+      split, \([\text{start}, \text{median})\) and \([\text{median},
+      \text{end})\).
+      <br />
+      Note that we don't need to divide by the total surface area in the
+      heuristic since the initial surface area is the same for the three axis we
+      are comparing.
+      <h3>Images</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="2/CBbunny.png" width="400px" />
+              <figcaption>CBbunny (0.2098s with BVH)</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="2/maxplanck.png" width="400px" />
+              <figcaption>Maxplanck. (0.0727s with BVH)</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="2/CBlucy.png" width="400px" />
+              <figcaption>CBlucy. (1.1545s with BVH)</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="2/CBdragon.png" width="400px" />
+              <figcaption>CBdragon. (0.9866s with BVH)</figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <h3>Image Comparison</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="2/cow.png" width="400px" />
+              <figcaption>
+                Cow. (52.4115s without BVH, 0.0635s with BVH)
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="2/CBbunny.png" width="400px" />
+              <figcaption>
+                CBbunny. (58.8263s without BVH, 0.2098s with BVH)
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="2/beast.png" width="400px" />
+              <figcaption>
+                Beast. (591.4767s without BVH, 0.0594s with BVH)
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="2/teapot.png" width="400px" />
+              <figcaption>
+                Teapot. (20.7884s without BVH, 0.0603s with BVH)
+              </figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <br />
+      <br />
+      We can see that the BVH reduces the rendering time significantly for all
+      images. For example, the Beast file took almost 10 minutes to render
+      without BVH, but with BVH it took less than a second. BVH allows us to
+      only have to check intersections with the triangles whose bounding node is
+      intersected. Additionally, when traversing through the BVH and checking
+      intersections with the left and right nodes, the calculation for checking
+      a ray intersection with a box is much simpler than a ray with a triangle.
+      Thus, the algorithm is much more efficient than the naive algorithm of
+      checking every single triangle in the scene, especially for scenes with
+      tens of thousands of triangles like the Beast scene.
 
       <h2>Part 3: Direct Illumination</h2>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
