@@ -254,14 +254,137 @@
       tens of thousands of triangles like the Beast scene.
 
       <h2>Part 3: Direct Illumination</h2>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-      est laborum.
+      <h3>Direct Lighting Algorithm</h3>
+      The first one-bounce lighting algorithm naively takes samples from the
+      entire hemisphere and determines the amount of radiance hitting the point
+      in the direction of the camera. We need to solve the following equation:
+      \[ \frac{1}{N} \sum_{j=1}^N \frac{fr(p, \omega_j \to \omega_r)L_i(p,
+      \omega_j) \cos \theta_j}{p(\omega_j)} \] The algorithm first involved
+      taking a direction sample using
+      <code>hemisphereSampler->get_sample()</code>, which returns a sample in
+      the unit hemisphere giving us \(\omega_j\). We also need to convert this
+      direction into world space, using the <code>o2w</code> matrix. Afterwards,
+      we create a ray starting from the hit point, going in the sampled
+      direction, and get the intersection point and its emission, giving us
+      \(L_i\). We can get \(fr(p, \omega_j \to \omega_r)\) using the BRDF of the
+      hit point. Since we sample uniformly over the hemisphere, \(p(\omega_j) =
+      \frac{1}{2 \pi}\). Finally, we can calculate \(\cos \theta\) using the dot
+      product between the world incoming vector and the normal vector of the hit
+      point intersection. We take the average of all the samples, and return the
+      result.
+      <br />
+      <br />
+      The second once-bounce lighting algorithm importance samples from only the
+      lights from the hemisphere. We still need to solve the same equation: \[
+      \frac{1}{N} \sum_{j=1}^N \frac{fr(p, \omega_j \to \omega_r)L_i(p,
+      \omega_j) \cos \theta_j}{p(\omega_j)} \] We iterate through each of the
+      lights. If the light is a point light, we make a single sample in its
+      direction, otherwise we make <code>ns_area_light</code> amount of samples.
+      For each sample, we get the \(L_i\), direction, distance to the light
+      source, and its probability distribution function \(pdf\) using
+      <code>light->sample()</code>. The direction returned is in world space, so
+      we use the <code>w2o</code> matrix to convert it into unit hemisphere
+      space. Again, we get \(fr(p, \omega_j \to \omega_r)\) from the BRDF of the
+      hit point. However, now instead of checking for an intersection for the
+      new sampled ray we send out, we limit its <code>max_t</code> to the
+      distance to the light source. This means that if it doesn't intersect with
+      anything, the light source will reach the object, and we can directly use
+      the \(L_i\) variable we found earlier. Finally, we again take the dot
+      product between the incoming ray and the normal vector at the hit point to
+      get \(\cos \theta_j\). We take the average of all of the samples to get
+      the answer for the single light source. Finally, we return the sum over
+      all of the light sources.
 
+      <h3>Image Comparison</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="3/bunny_H.png" width="400px" />
+              <figcaption>
+                Hemisphere CBbunny (64 samples, 4 light rays.).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="3/bunny_I.png" width="400px" />
+              <figcaption>
+                Importance Sampling CBbunny (64 samples, 4 light rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="3/dragon_H.png" width="400px" />
+              <figcaption>
+                Hemisphere CBdragon (64 samples, 4 light rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="3/dragon_I.png" width="400px" />
+              <figcaption>
+                Importance Sampling CBdragon (64 samples, 4 light rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="3/coil_H.png" width="400px" />
+              <figcaption>
+                Hemisphere CBcoil (64 samples, 4 light rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="3/coil_I.png" width="400px" />
+              <figcaption>
+                Importance Sampling CBcoil (64 samples, 4 light rays).
+              </figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <h3>Difference Between Hemisphere and Importance Sampling</h3>
+      Since importance sampling samples from an underlying distribution by only
+      sampling towards light sources, the Monte Carlo equation for calculating
+      light converges to the actual result much faster. This leads to images
+      with the same amount of samples looking much less noisy with importance
+      sampling compared to naive hemisphere sampling.
+      <h3>Images with Importance Sampling</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="3/coil_I11.png" width="400px" />
+              <figcaption>CBcoil (1 sample per pixel, 1 light ray).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="3/coil_I14.png" width="400px" />
+              <figcaption>
+                CBcoil (1 sample per pixel, 4 light rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="3/coil_I116.png" width="400px" />
+              <figcaption>
+                CBcoil (1 sample per pixel, 16 light rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="3/coil_I164.png" width="400px" />
+              <figcaption>
+                CBcoil (1 sample per pixel, 64 light rays).
+              </figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      We can see that in soft shadows, the more light rays we use per pixel
+      sample, the less noise there is.
       <h2>Part 4: Global Illumination</h2>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
