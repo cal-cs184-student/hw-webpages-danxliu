@@ -386,22 +386,267 @@
       We can see that in soft shadows, the more light rays we use per pixel
       sample, the less noise there is.
       <h2>Part 4: Global Illumination</h2>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-      est laborum.
-
+      <h3>Indirect Lighting Algorithm</h3>
+      The indirect lighting algorithm, implemented in
+      <code>at_least_one_bounce_radiation</code>, involves taking the hit point,
+      sampling a new ray based on the BSDF, and recursively calling the function
+      on the new ray. We set a hard limit on the amount of times we recurse
+      using <code>ray.depth</code> to prevent infinite recursion. Finally, we
+      use Russian Roulette with a probability of continuing at \(0.7\).
+      <br />
+      We determine the ray to send out using the <code>sample_f</code> function
+      from the intersection's BSDF, which also gives us \(fr\), \(\omega_j\),
+      and \(pdf\). We then pass the ray and its intersection into a recursive
+      call, getting back the sampled radiance into the point. Now, we can
+      multiply the radiance in with \(fr\), \(\omega_j\), and the dot product
+      between the hit point normal and the new outgoing ray, divided by the pdf
+      and \(0.7\).
+      <h3>Direct vs Indirect Illumination</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="4/spheres_direct_illumination.png" width="400px" />
+              <figcaption>Spheres Direct Illumination.</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/spheres_indirect_illumination.png" width="400px" />
+              <figcaption>Spheres Indirect Illumination.</figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      We can see that the direct illumination leaves out the ambient
+      illumination seen in the indirect illumination picture. It also does not
+      have the light reflected from the ceiling to the camera. On the other
+      handl, indirect illumination is much more natural, but doesn't have the
+      direct illumination from the light directly to the camera. As a result,
+      the light doesn't glow.
+      <h3>Max Ray Depth</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny0_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 0).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny0_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 0).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny1_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 1).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny1_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 1).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny2_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 2).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny2_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 2).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny3_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 3).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny3_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 3).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny4_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 4).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny4_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 4).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny5_notacc.png" width="400px" />
+              <figcaption>Bunny (Not Accumulated, Max Ray Depth 5).</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny5_acc.png" width="400px" />
+              <figcaption>Bunny (Accumulated, Max Ray Depth 5).</figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      I can see that the second and third bounces of light contribute a lot
+      towards the ambient lighting of the picture. Each successive bounce is
+      darker and contributes less. The second bounce fills in a lot of the
+      shadows, including illuminating the ceiling and adds color bleeding from
+      the reflectance from the wall materials. The third bounce adds more
+      smoothness and further improves the realism of the shadows, but it
+      contributes much less.
+      <h3>Russian Roulette Rendering</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny0.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 0).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny1.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 1).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny2.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 2).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny3.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 3).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny4.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 4).</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny100.png" width="400px" />
+              <figcaption>Bunny (Max Ray Depth 100).</figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <h3>Sample Per Pixel Comparison</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="4/dragon_1.png" width="400px" />
+              <figcaption>
+                CBDragon (1 Sample Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/dragon_2.png" width="400px" />
+              <figcaption>
+                CBDragon (2 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/dragon_4.png" width="400px" />
+              <figcaption>
+                CBDragon (4 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/dragon_8.png" width="400px" />
+              <figcaption>
+                CBDragon (8 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/dragon_16.png" width="400px" />
+              <figcaption>
+                CBDragon (16 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/dragon_64.png" width="400px" />
+              <figcaption>
+                CBDragon (64 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/dragon_1024.png" width="400px" />
+              <figcaption>
+                CBDragon (1024 Samples Per Pixel, 4 Light Rays).
+              </figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
+      We can see the more samples per pixel, the less noise there is for the
+      pixel color. This is because the less samples there are, the more likely
+      it is that it reflects only a single wall color and not smooth natural
+      blend like it should be. Comparing 64 and 1024, we can see that the noise
+      decreases slightly, but there is a much smaller difference than between 1
+      sample and 2 samples per pixel.
       <h2>Part 5: Adaptive Sampling</h2>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-      est laborum.
+      <h3>Adaptive Sampling Algorithm</h3>
+      Adaptive sampling allows us to estimate how close we are to the true
+      illumination based on the sampled standard deviation and mean. If we
+      detect we are close to the true illumination, we can simply stop rendering
+      to improve speed. Given \(s_1\), the sum of sample illuminations, and
+      \(s_2\), the sum of squared sampled illusions, we can calculate sample
+      mean and the sample standard deviation for the current \(n\) samples as
+      follows: \[ \begin{align*} \mu &= \frac{s_1}{n} \\ \sigma &=
+      \sqrt{\frac{1}{n-1} * (s_2 - \frac{s_1^2}{n})} \\ I &= 1.96 *
+      \frac{\sigma}{\sqrt{n}} \end{align*} \] We do this every
+      <code>samplePerBatch</code> iterations to prevent recalculating for every
+      sample. If \( I \leq \text{maxTolerance} \times \mu \), then we say that
+      we are \(95\%\) confident that the actual illuminance falls between the
+      interval \([\mu - I, \mu + I]\). This will allow us to early exit when we
+      are confident enough, potentially saving some samples.
+      <h3>Images</h3>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <table
+          style="width: 100%; text-align: center; border-collapse: collapse"
+        >
+          <tr>
+            <td style="text-align: center">
+              <img src="4/bunny.png" width="400px" />
+              <figcaption>Bunny.</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/bunny_rate.png" width="400px" />
+              <figcaption>Bunny Sampling Rate.</figcaption>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center">
+              <img src="4/spheres.png" width="400px" />
+              <figcaption>Spheres.</figcaption>
+            </td>
+            <td style="text-align: center">
+              <img src="4/spheres_rate.png" width="400px" />
+              <figcaption>Spheres Sampling Rate.</figcaption>
+            </td>
+          </tr>
+        </table>
+      </div>
 
       <h2>(Optional) Part 6: Extra Credit Opportunities</h2>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
