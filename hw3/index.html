@@ -50,10 +50,20 @@
 		-->
 
       <h2>Overview</h2>
-      Give a high-level overview of what you implemented in this homework. Think
-      about what you've built as a whole. Share your thoughts on what
-      interesting things you've learned from completing the homework.
-
+      In this project, I build out the key components of the raytracing
+      pipeline. I start by implementing the ability to create a ray from the
+      camera through a given pixel, and calculating where it hits the scene
+      using the triangle and sphere intersection equations. Next, I optimized
+      the ray intersection checks by storing objects in a bounding volume
+      hierarchy instead of iterating through every single object in the entire
+      scene, improving the performance. To add proper lighting and scene colors,
+      I implemented the zero and one-bounce lighting algorithms, with both
+      hemisphere sampling and importance sampling the lights. Afterwards, I
+      expanded this by adding further indirect light illumination, using both
+      the Russian Roulette and max ray depth termination criteria, giving the
+      scene much more realistic lighting. Finally, I implemented adaptive
+      sampling to reduce the amount of sampling required for each pixel if we
+      estimate that the pixel color converged.
       <h2>Part 1: Ray Generation and Scene Intersection</h2>
       <h3>Ray Generation and Primitive Intersections</h3>
       To draw images using ray tracing, a few steps need to be implemented. We
