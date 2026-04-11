@@ -213,11 +213,122 @@
     </div>
 
     <h2>Part 4: Handling self-collisions</h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+    <h3>Implementation</h3>
+    <p>
+      To implement self-collisions, I first implemented a 3D hash function to group together point masses that are in a
+      similar location.
+      This allows us to reduce time in the future when we are checking point masses that are close to each other.
+      To implement the function, I first partitioned the 3D grid into boxes, and determined which box a point belongs
+      to.
+      I reference the points indexes, multiply them each with unique large prime numbers, then add them together to
+      ideally form a unique hash number for each box.
+      Afterwards, I implemented the <code>build_spatial_map</code> function, which loops through the point masses and
+      assigns them to a hash bucket based on their hash value.
+      Finally, I implemented a <code>self_collide</code> function that checks all point masses in the same hash bucket for collisions.
+      For all point masses within a certain distance, \(2.0 * \text{thickness}\), away from the current point mass, I calculate the correction vector.
+      The correction vector is the vector that when applied to the current point mass, moves it \(2.0 * \text{thickness}\) away from the candidate point mass.
+      Finally, I average all of the correction vectors, scale it by <code>simulation_steps</code>, and set the new point mass position to it.
+    </p>
+    <h3>Screenshots</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/sheet1.png" width="400px" />
+            <figcaption>Sheet falling.</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/sheet2.png" width="400px" />
+            <figcaption>Sheet hit the ground.</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/sheet3.png" width="400px" />
+            <figcaption>Sheet flattening on the ground..</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h4>Varying \(k_s\)</h4>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/1_ks3000.png" width="400px" />
+            <figcaption>\(k_s = 3000\)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/1_ks10000.png" width="400px" />
+            <figcaption>\(k_s = 10000\)</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/2_ks3000.png" width="400px" />
+            <figcaption>\(k_s = 3000\)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/2_ks10000.png" width="400px" />
+            <figcaption>\(k_s = 10000\)</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/3_ks3000.png" width="400px" />
+            <figcaption>\(k_s = 3000\)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/3_ks10000.png" width="400px" />
+            <figcaption>\(k_s = 10000\)</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p>
+    We can see that when the \(k_s\) is larger, the sheet appears stiffer and there are fewer folds, especially during the first collision of the sheet with the plane.
+    Because there are much more folds with a smaller \(k_s\), the folding of the cloth appears more odd, with more artifacts.
+    </p>
+    <h4>Varying Density</h4>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/1_density5.png" width="400px" />
+            <figcaption>Density = 5</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/1_density25.png" width="400px" />
+            <figcaption>Density = 25</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/2_density5.png" width="400px" />
+            <figcaption>Density = 5</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/2_density25.png" width="400px" />
+            <figcaption>Density = 25</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="4/3_density5.png" width="400px" />
+            <figcaption>Density = 5</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="4/3_density25.png" width="400px" />
+            <figcaption>Density = 25</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p>
+    Here, the opposite of what I expected occured.
+    I thought that a denser cloth would have less folds, but it appears that the denser cloth actually had more folds than the less dense cloth.
+    At the end, when it collapses and begins to slowly move apart, the less dense cloth appears to have an easier time unfolding than the denser cloth.
+    </p>
     <h2>Part 5: Shaders</h2>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
     aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
