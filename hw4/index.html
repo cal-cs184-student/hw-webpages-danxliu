@@ -80,9 +80,11 @@
     </div>
     <h3>Low vs High \(k_s\)</h3>
     <p>
-    I varied the spring constant on the <code>scene/pinned2.json</code> file.
-    Using a very low \(k_s\) causes the cloth to droop down very low, since a low spring constant leads to low stiffness.
-    Using a very high \(k_s\) causes cloth to only bend a little at the top, since a high spring constant leads to high stiffness.
+      I varied the spring constant on the <code>scene/pinned2.json</code> file.
+      Using a very low \(k_s\) causes the cloth to droop down very low, since a low spring constant leads to low
+      stiffness.
+      Using a very high \(k_s\) causes cloth to only bend a little at the top, since a high spring constant leads to
+      high stiffness.
     </p>
     <div style="display: flex; flex-direction: column; align-items: center;">
       <table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -100,9 +102,9 @@
     </div>
     <h3>Low vs High Density</h3>
     <p>
-    I varied the density on the <code>scene/pinned2.json</code> file.
-    Using a very high density causes the cloth to droop down very low, since the cloth is weighed down more.
-    Using a very low density causes the cloth to only bend down a little, since the cloth is not as weighted down.
+      I varied the density on the <code>scene/pinned2.json</code> file.
+      Using a very high density causes the cloth to droop down very low, since the cloth is weighed down more.
+      Using a very low density causes the cloth to only bend down a little, since the cloth is not as weighted down.
     </p>
     <div style="display: flex; flex-direction: column; align-items: center;">
       <table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -120,9 +122,11 @@
     </div>
     <h3>Low vs High Damping</h3>
     <p>
-    I varied the damping on the <code>scene/pinned2.json</code> file.
-    Using a very high damping causes the cloth to become very slow when moving, and not sway at all like a solid object.
-    Using a very low damping causes the cloth to sway intensely and move very fast, like it was made out of very loose material.
+      I varied the damping on the <code>scene/pinned2.json</code> file.
+      Using a very high damping causes the cloth to become very slow when moving, and not sway at all like a solid
+      object.
+      Using a very low damping causes the cloth to sway intensely and move very fast, like it was made out of very loose
+      material.
     </p>
     <div style="display: flex; flex-direction: column; align-items: center;">
       <table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -140,10 +144,73 @@
     </div>
 
     <h2>Part 3: Handling collisions with other objects</h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    <h3>Implementation</h3>
+    <p>
+      To implement sphere collision, I first determined whether or not the new location of the point mass was inside the
+      sphere's radius or not.
+      If it was outside, then I just returned.
+      Otherwise, I determined the target point by finding the unit vector from the sphere's center to the current point
+      mass location, then multiplying it by the sphere's radius.
+      This is the point that we want the sphere to be at.
+      To get the point mass to the target point, I calculate the correction vector, or the difference between the target
+      point and the last position of the point mass.
+      Finally, I move the location of the point mass by taking its last location and add the correction vector (times 1
+      -
+      friction) to it and preventing it from intersecting the sphere.
+    </p>
+    <p>
+      To implement plane collision, I first determine which side of the plane both the current and last positions are.
+      Given the normal vector \(n\) and a point on the plane \(p\), the following equation can be used to determine the
+      side of the plane \(x\) is on based on the negation sign:
+      \[
+      (x - p) \cdot n
+      \]
+      If both the current and last position are on the same side of the plane, I just return, since no collision occurs.
+      Otherwise, I first calculate the tangent point by projecting the position onto the plane.
+      Then, I calculate the sign, or the direction where the point came from.
+      This can be used to calculate the target point of where we want the point mass to be, which is slightly away from
+      the tangent point in the direction it came from, multiplied by <code>SURFACE_OFFSET</code>.
+      Finally, we again calculate the correction vector by subtracting the last position from the target point, and set
+      the position of the point mass to its last location plus the correction vector times 1 - friction.
+    </p>
+    <h3>Sphere Images</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="3/sphere_ks5000.png" width="400px" />
+            <figcaption>Sheet on sphere with \(k_s = 5000\).</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="3/sphere_ks500.png" width="400px" />
+            <figcaption>Sheet on sphere with \(k_s = 500\).</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="3/sphere_ks50000.png" width="400px" />
+            <figcaption>Sheet on sphere with \(k_s = 50000\).</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      The \(k_s\) coefficient controls how stiff the sheet is, with a higher \(k_s\) being more stiff.
+      Thus, we can see that the cloth deforms less the higher the \(k_s\) is.
+      The sheet with \(k_s = 500\) almost wraps around the ball, he sheet with \(k_s = 50000\) has its edges spread out
+      from the ball, and the sheet with \(k_s = 5000\) is somewhere in between.
+    </p>
+    <h3>Plane Images</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="3/plane.png" width="400px" />
+            <figcaption>Sheet on plane.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <h2>Part 4: Handling self-collisions</h2>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
