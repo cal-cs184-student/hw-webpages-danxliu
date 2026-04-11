@@ -224,10 +224,14 @@
       ideally form a unique hash number for each box.
       Afterwards, I implemented the <code>build_spatial_map</code> function, which loops through the point masses and
       assigns them to a hash bucket based on their hash value.
-      Finally, I implemented a <code>self_collide</code> function that checks all point masses in the same hash bucket for collisions.
-      For all point masses within a certain distance, \(2.0 * \text{thickness}\), away from the current point mass, I calculate the correction vector.
-      The correction vector is the vector that when applied to the current point mass, moves it \(2.0 * \text{thickness}\) away from the candidate point mass.
-      Finally, I average all of the correction vectors, scale it by <code>simulation_steps</code>, and set the new point mass position to it.
+      Finally, I implemented a <code>self_collide</code> function that checks all point masses in the same hash bucket
+      for collisions.
+      For all point masses within a certain distance, \(2.0 * \text{thickness}\), away from the current point mass, I
+      calculate the correction vector.
+      The correction vector is the vector that when applied to the current point mass, moves it \(2.0 *
+      \text{thickness}\) away from the candidate point mass.
+      Finally, I average all of the correction vectors, scale it by <code>simulation_steps</code>, and set the new point
+      mass position to it.
     </p>
     <h3>Screenshots</h3>
     <div style="display: flex; flex-direction: column; align-items: center;">
@@ -286,8 +290,10 @@
       </table>
     </div>
     <p>
-    We can see that when the \(k_s\) is larger, the sheet appears stiffer and there are fewer folds, especially during the first collision of the sheet with the plane.
-    Because there are much more folds with a smaller \(k_s\), the folding of the cloth appears more odd, with more artifacts.
+      We can see that when the \(k_s\) is larger, the sheet appears stiffer and there are fewer folds, especially during
+      the first collision of the sheet with the plane.
+      Because there are much more folds with a smaller \(k_s\), the folding of the cloth appears more odd, with more
+      artifacts.
     </p>
     <h4>Varying Density</h4>
     <div style="display: flex; flex-direction: column; align-items: center;">
@@ -325,32 +331,157 @@
       </table>
     </div>
     <p>
-    Here, the opposite of what I expected occured.
-    I thought that a denser cloth would have less folds, but it appears that the denser cloth actually had more folds than the less dense cloth.
-    At the end, when it collapses and begins to slowly move apart, the less dense cloth appears to have an easier time unfolding than the denser cloth.
+      Here, the opposite of what I expected occured.
+      I thought that a denser cloth would have less folds, but it appears that the denser cloth actually had more folds
+      than the less dense cloth.
+      At the end, when it collapses and begins to slowly move apart, the less dense cloth appears to have an easier time
+      unfolding than the denser cloth.
     </p>
     <h2>Part 5: Shaders</h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-    <h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-    <h2>Additional Notes (please remove)</h2>
-    <ul>
-      <li>You can also add code if you'd like as so: <code>code code code</code></li>
-      <li>If you'd like to add math equations,
-        <ul>
-          <li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-          <li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-        </ul>
-      </li>
-    </ul>
+    <h3>Shader Programs</h3>
+    <p>
+      Shader programs are snippets of C/C++ style code that run on the GPU to calculate how 3D objects are drawn to the
+      screen.
+      There are two main types of shaders you write: vertex shaders and fragment (pixel) shaders.
+    </p>
+    <p>
+      The vertex shader is applied to every single vertex. It takes in information about a single vertex, such as its 3D
+      position, normal vector, and texture coordinates.
+      It outputs the final position of that vertex on the screen, along with any other information that should be passed
+      on.
+    </p>
+    <p>
+      The fragment shader is applied to fragments, pixels from connected triangles formed by the vertices.
+      It takes as input the interpolated data from the step above, such as the interpolated normal or position for the
+      specific pixel, plus global information like camera position or lighting.
+      It outputs the final color of a single pixel on the screen.
+    </p>
+    <h3>Blinn Phong Shading</h3>
+    <p>
+      The Blinn-Phong shading model is a model that creates semi-realistic shading by approximating the different types
+      of
+      lighting. It is made out of three main lighting parts, summed together:
+    </p>
+    <p>
+      Ambient Lighting: Lighting that lights up the whole model, simulating light bouncing off the walls of a room and
+      creating global illumination.
+    </p>
+    <p>
+      Diffuse Lighting: Lighting that simulates a diffuse reflection, where light hits a rough surface and bounces
+      evenly
+      in all directions. It causes parts of the object whose normal vectors are pointing directly at the light source to
+      appear brighter, regardless of where the observer is looking from.
+    </p>
+    <p>
+      Specular Lighting: Lighting that simulates the shiny spots on a surface, like plastic or glass. In the Blinn-Phong
+      model specifically, this is calculated by finding the "halfway vector" between the light source and the observer.
+      If
+      this halfway vector aligns closely with the surface normal, that part of the object appears brighter, creating a
+      specular highlight.
+    </p>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/phong.png" width="400px" />
+            <figcaption>Full Phong Shading</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/phong_ambient.png" width="400px" />
+            <figcaption>Phong Ambient Shading</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/phong_diffuse.png" width="400px" />
+            <figcaption>Phong Diffuse Shading</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/phong_specular.png" width="400px" />
+            <figcaption>Phong Specular Shading</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Texure Mapping Images</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/texture3.png" width="400px" />
+            <figcaption>Texture 3</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/texture4.png" width="400px" />
+            <figcaption>Texture 4</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Bump & Displacement Mapping</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/bump.png" width="400px" />
+            <figcaption>Bump (default)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/displacement.png" width="400px" />
+            <figcaption>Displacement (default)</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/bump_1616.png" width="400px" />
+            <figcaption>Bump (o=16, a=16)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/displacement_1616.png" width="400px" />
+            <figcaption>Displacement (o=16, a=16)</figcaption>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/bump_128128.png" width="400px" />
+            <figcaption>Bump (o=128, a=128)</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/displacement_128128.png" width="400px" />
+            <figcaption>Displacement (o=128, a=128)</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      We can see that there is a slight difference between the bump and displacement mapping.
+      Displacement mapping actually changes the normal vectors of the vertices, acting on both vertices and fragments.
+      On the other hand, bump mapping only changes how the pixels are shaded, acting only on fragments.
+      We can see this in the images, where the displacement mapping cloths are actually deformed along the ridges of the
+      brick lines, whie the bump mapping cloths are still smooth.
+    </p>
+    <p>
+      Comparing the resolution of the cloth between \(a = 16, o = 16\) and \(a = 128, o = 128\), from first glance there
+      is not much of a difference between the images.
+      However, looking at the displacement mapping we can see that the displacement ridges of the texture look a bit
+      smoother with the higher resolution.
+      The lower resolution causes the cloth to look unnatural and have slightly sharper angles.
+    </p>
+    <h3>Mirror Images</h3>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="5/mirror1.png" width="400px" />
+            <figcaption>Mirror Initial</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="5/mirror2.png" width="400px" />
+            <figcaption>Mirror Simulated</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </body>
 
