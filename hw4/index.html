@@ -68,10 +68,76 @@
     </div>
 
     <h2>Part 2: Simulation via numerical integration</h2>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="2/sheet_final.png" width="400px" />
+            <figcaption>Final resting state.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Low vs High \(k_s\)</h3>
+    <p>
+    I varied the spring constant on the <code>scene/pinned2.json</code> file.
+    Using a very low \(k_s\) causes the cloth to droop down very low, since a low spring constant leads to low stiffness.
+    Using a very high \(k_s\) causes cloth to only bend a little at the top, since a high spring constant leads to high stiffness.
+    </p>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="2/sheet_ks1.png" width="400px" />
+            <figcaption>Sheet with \(k_s = 1\) N/m.</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="2/sheet_ks100000.png" width="400px" />
+            <figcaption>Sheet with \(k_s = 100000\) N/m.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Low vs High Density</h3>
+    <p>
+    I varied the density on the <code>scene/pinned2.json</code> file.
+    Using a very high density causes the cloth to droop down very low, since the cloth is weighed down more.
+    Using a very low density causes the cloth to only bend down a little, since the cloth is not as weighted down.
+    </p>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="2/sheet_density1.png" width="400px" />
+            <figcaption>Sheet with density = 1 g/cm^2.</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="2/sheet_density1000.png" width="400px" />
+            <figcaption>Sheet with density = 1000 g/cm^2.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <h3>Low vs High Damping</h3>
+    <p>
+    I varied the damping on the <code>scene/pinned2.json</code> file.
+    Using a very high damping causes the cloth to become very slow when moving, and not sway at all like a solid object.
+    Using a very low damping causes the cloth to sway intensely and move very fast, like it was made out of very loose material.
+    </p>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <table style="width: 100%; text-align: center; border-collapse: collapse;">
+        <tr>
+          <td style="text-align: center;">
+            <img src="2/sheet_damping0.01.png" width="400px" />
+            <figcaption>Sheet with damping = 0.01.</figcaption>
+          </td>
+          <td style="text-align: center;">
+            <img src="2/sheet_damping1.png" width="400px" />
+            <figcaption>Sheet with damping = 1.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
 
     <h2>Part 3: Handling collisions with other objects</h2>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
